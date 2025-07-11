@@ -90,68 +90,77 @@
   const photo = document.getElementById('photo');
   const message = document.getElementById('message');
 
-    let stream, blob;
-    const DROPBOX_ACCESS_TOKEN = 'sl.u.AF1AVvWSZesjV8N-pZTAvwUM-puo2R8g9B9RC9ItUPLcsZIt3VvpbWwFJ-q8z53OllgXTvNjMMGrvMokyoVnUbO27GWZRK6TGinWTiuxk595QK0uThDG3i5EFN9-6hluDvjCw1l3iCc9ZFIM5yTQA8dU_tgRilKGydd1Y_MTu49xQ8JXlKmtM0nsYdPh1NiOFzk279ytGFFT9gxjk7NGMbtyUZ9cQYZhuKtbWrcvMH1qbxG2GW9jaLVcCVcPZl9s59E3esUrN-Ne_uiHHBvbtSjsCxoAPjeGZxoZMUbw5LfQDbJVFR5iFlwzwFqW7kJhrhq3atuq-MfuGEhsiIsbzrEJfoI_rvn26I7ZAgSQBxxOLqTKzN1v2vgSby3F5XVR1HtbigViBLNoSv78BdW_Jn71Oi29mo2SxT-0hHtFxb_NB7-vEtMYtCQuC7nc9ZvTc8ztcjzPDryvYvWzxrjRwYT2uYLksUnYVpM9_q9WLHiCDOPPhmWKYjvv0mCdkWgftdw7nPMrkL4PWN0BI734V3F157hDi2jipnXVkinfOENZ16CqrKXkbF7fT0H119I8_5_mj_Px-Y_wgYQFWHSqiE80ybLI6QjXMWzwVZ9tdHEUIsmxZHJd2E1Sl9Ml-TTKy4wI7PKsZm4kkJspHwfw7-J9z3YwFLFFelU2rlA32gMzKffPHhuMqvsqywVTYVzTR7MGsKLq3byiXjFIwhI2IcYHXiX7glau7rWjkdnAGeGOls8BH4O54x7_Ujm7ItBe4QW43RouiKbf1hFcN4Nq8KziAOFiekyUmNSm-20fcLVg5HoR81pYO8Cw66MpAOPohXZQR75pohEqjtVXjEzwqTpBWzRl35pZpE0ivAHsQzuzo0330YHUEB1WVgPtxZYp-AbJRpTmiTUPSknWVSlYIoCUTsh5xrBLMn7N-nWybUp-y5pJ8dxcOv6ZkzjBBBAunmc5jz32qi1VZqxy0NRzRN5Pvz4JS-FxwJXkTmYQNP3dRqIJUnXp4lp2QCOf5JwYiFEEkGmkIKF4pXrmWjhXTIu7X_tB7YhWlBYIF6VxDmYu__-pBERMJW3FU8YERG02pkY9CzD_YEOqurp65VB4pT8MNSXnUxCyNEx3xqTyTWn3hIHDCj3DQKfJ-13iZHwilyCopFr9xvxg8D-hn5V9pJqdtXPm2jTWvuXSHSAg5ihY8HvAK4jJtIEQh0xOGLV0436thTg4o87fIQJYDriWV-mp_p2rOAS9llwgLs9mUVtZ5Lk5qrkQrZatyvAyaPpD6klKSkBzKVFmrFoCEQ0HSKfwXcZhPewkh8lCVw-DVZSQFg';
+    let currentStream = null;
+  let currentFacingMode = 'user'; // 'user' = front, 'environment' = back
+  let capturedImageBlob = null;
 
-    async function listCameras() {
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      devices.filter(d => d.kind === 'videoinput').forEach((d, i) => {
-        const option = document.createElement('option');
-        option.value = d.deviceId;
-        option.text = d.label || `Kamera ${i+1}`;
-        cameraSelect.appendChild(option);
+  async function startCamera(facingMode) {
+    if (currentStream) {
+      currentStream.getTracks().forEach(track => track.stop());
+    }
+    try {
+      currentStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { exact: facingMode } },
+        audio: false
       });
-    }
-
-    async function startCamera() {
-      if (stream) stream.getTracks().forEach(t => t.stop());
+      video.srcObject = currentStream;
+      currentFacingMode = facingMode;
+      message.textContent = '';
+      document.getElementById('uploadBtn').disabled = true;
+      photo.src = '';
+      capturedImageBlob = null;
+    } catch (err) {
+      // Fallback: ohne exact (bei manchen Browsern besser)
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: cameraSelect.value } });
-        video.srcObject = stream;
-        video.style.display = 'block';
-        snapBtn.disabled = false;
-        message.textContent = '';
-      } catch {
-        message.textContent = 'Kamera-Zugriff fehlgeschlagen';
-      }
-    }
-
-    snapBtn.onclick = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      canvas.getContext('2d').drawImage(video, 0, 0);
-      canvas.toBlob(b => {
-        blob = b;
-        photo.src = URL.createObjectURL(b);
-        photo.style.display = 'block';
-        uploadBtn.disabled = false;
-      }, 'image/jpeg', 0.9);
-      video.style.display = 'none';
-    };
-
-    uploadBtn.onclick = async () => {
-      if (!blob) return;
-      message.textContent = 'Lade hoch...';
-      const filename = `JessicaChristoph_${Date.now()}.jpg`;
-      try {
-        const res = await fetch('https://content.dropboxapi.com/2/files/upload', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${DROPBOX_ACCESS_TOKEN}`,
-            'Dropbox-API-Arg': JSON.stringify({ path: '/' + filename, mode: 'add', autorename: true, mute: false }),
-            'Content-Type': 'application/octet-stream'
-          },
-          body: blob
+        currentStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: facingMode },
+          audio: false
         });
-        if (!res.ok) throw new Error();
-        message.textContent = 'Upload erfolgreich 🎉';
-        uploadBtn.disabled = true;
-      } catch {
-        message.textContent = 'Upload fehlgeschlagen';
+        video.srcObject = currentStream;
+        currentFacingMode = facingMode;
+        message.textContent = '';
+        document.getElementById('uploadBtn').disabled = true;
+        photo.src = '';
+        capturedImageBlob = null;
+      } catch (error) {
+        console.error('Kamera konnte nicht gestartet werden:', error);
+        message.textContent = 'Kamera konnte nicht gestartet werden. Bitte überprüfe die Berechtigungen.';
       }
-    };
+    }
+  }
 
+  document.getElementById('frontBtn').addEventListener('click', () => startCamera('user'));
+  document.getElementById('backBtn').addEventListener('click', () => startCamera('environment'));
+
+  document.getElementById('takePhotoBtn').addEventListener('click', () => {
+    if (!currentStream) {
+      message.textContent = 'Bitte erst Kamera auswählen.';
+      return;
+    }
+    const width = video.videoWidth;
+    const height = video.videoHeight;
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, width, height);
+    canvas.toBlob(blob => {
+      capturedImageBlob = blob;
+      photo.src = URL.createObjectURL(blob);
+      document.getElementById('uploadBtn').disabled = false;
+      message.textContent = 'Foto aufgenommen. Jetzt Hochladen klicken.';
+    }, 'image/jpeg', 0.95);
+  });
+
+  document.getElementById('uploadBtn').addEventListener('click', async () => {
+    if (!capturedImageBlob) {
+      message.textContent = 'Bitte erst ein Foto machen.';
+      return;
+    }
+
+    message.textContent = 'Lade Bild hoch...';
+
+    const DROPBOX_ACCESS_TOKEN = 'sl.u.AF1AVvWSZesjV8N-pZTAvwUM-puo2R8g9B9RC9ItUPLcsZIt3VvpbWwFJ-q8z53OllgXTvNjMMGrvMokyoVnUbO27GWZRK6TGinWTiuxk595QK0uThDG3i5EFN9-6hluDvjCw1l3iCc9ZFIM5yTQA8dU_tgRilKGydd1Y_MTu49xQ8JXlKmtM0nsYdPh1NiOFzk279ytGFFT9gxjk7NGMbtyUZ9cQYZhuKtbWrcvMH1qbxG2GW9jaLVcCVcPZl9s59E3esUrN-Ne_uiHHBvbtSjsCxoAPjeGZxoZMUbw5LfQDbJVFR5iFlwzwFqW7kJhrhq3atuq-MfuGEhsiIsbzrEJfoI_rvn26I7ZAgSQBxxOLqTKzN1v2vgSby3F5XVR1HtbigViBLNoSv78BdW_Jn71Oi29mo2SxT-0hHtFxb_NB7-vEtMYtCQuC7nc9ZvTc8ztcjzPDryvYvWzxrjRwYT2uYLksUnYVpM9_q9WLHiCDOPPhmWKYjvv0mCdkWgftdw7nPMrkL4PWN0BI734V3F157hDi2jipnXVkinfOENZ16CqrKXkbF7fT0H119I8_5_mj_Px-Y_wgYQFWHSqiE80ybLI6QjXMWzwVZ9tdHEUIsmxZHJd2E1Sl9Ml-TTKy4wI7PKsZm4kkJspHwfw7-J9z3YwFLFFelU2rlA32gMzKffPHhuMqvsqywVTYVzTR7MGsKLq3byiXjFIwhI2IcYHXiX7glau7rWjkdnAGeGOls8BH4O54x7_Ujm7ItBe4QW43RouiKbf1hFcN4Nq8KziAOFiekyUmNSm-20fcLVg5HoR81pYO8Cw66MpAOPohXZQR75pohEqjtVXjEzwqTpBWzRl35pZpE0ivAHsQzuzo0330YHUEB1WVgPtxZYp-AbJRpTmiTUPSknWVSlYIoCUTsh5xrBLMn7N-nWybUp-y5pJ8dxcOv6ZkzjBBBAunmc5jz32qi1VZqxy0NRzRN5Pvz4JS-FxwJXkTmYQNP3dRqIJUnXp4lp2QCOf5JwYiFEEkGmkIKF4pXrmWjhXTIu7X_tB7YhWlBYIF6VxDmYu__-pBERMJW3FU8YERG02pkY9CzD_YEOqurp65VB4pT8MNSXnUxCyNEx3xqTyTWn3hIHDCj3DQKfJ-13iZHwilyCopFr9xvxg8D-hn5V9pJqdtXPm2jTWvuXSHSAg5ihY8HvAK4jJtIEQh0xOGLV0436thTg4o87fIQJYDriWV-mp_p2rOAS9llwgLs9mUVtZ5Lk5qrkQrZatyvAyaPpD6klKSkBzKVFmrFoCEQ0HSKfwXcZhPewkh8lCVw-DVZSQFg';
+    
     startBtn.onclick = startCamera;
     cameraSelect.onchange = startCamera;
     listCameras();
