@@ -67,26 +67,28 @@
   <h2>20.06.2026</h2>
   <h3>Teilt eure besonderen Momente mit uns!</h3>
 
-  <label for="cameraSelect">Kamera wählen:</label><br/>
-  <select id="cameraSelect"></select><br/>
-  <button id="startBtn">Kamera starten</button>
-  <button id="snapBtn" disabled>📸 Foto machen</button>
+ <video id="video" autoplay playsinline></video>
+  <canvas id="canvas"></canvas>
+
+  <div>
+    <button id="frontBtn">Frontkamera</button>
+    <button id="backBtn">Rückkamera</button>
+  </div>
+
+  <button id="takePhotoBtn">📸 Foto machen</button>
   <button id="uploadBtn" disabled>⬆️ Hochladen</button>
 
-  <video id="video" autoplay playsinline style="display:none;"></video>
-  <img id="photo" style="display:none;" alt="Vorschau"/>
-  <div id="message"></div>
+  <img id="photo" alt="Aufgenommenes Foto" />
 
+  <div id="message"></div>
+  
   <footer>Danke fürs Mitmachen!</footer>
 
   <script>
-    const cameraSelect = document.getElementById('cameraSelect'),
-          startBtn = document.getElementById('startBtn'),
-          snapBtn  = document.getElementById('snapBtn'),
-          uploadBtn= document.getElementById('uploadBtn'),
-          video    = document.getElementById('video'),
-          photo    = document.getElementById('photo'),
-          message  = document.getElementById('message');
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const photo = document.getElementById('photo');
+  const message = document.getElementById('message');
 
     let stream, blob;
     const DROPBOX_ACCESS_TOKEN = 'sl.u.AF1AVvWSZesjV8N-pZTAvwUM-puo2R8g9B9RC9ItUPLcsZIt3VvpbWwFJ-q8z53OllgXTvNjMMGrvMokyoVnUbO27GWZRK6TGinWTiuxk595QK0uThDG3i5EFN9-6hluDvjCw1l3iCc9ZFIM5yTQA8dU_tgRilKGydd1Y_MTu49xQ8JXlKmtM0nsYdPh1NiOFzk279ytGFFT9gxjk7NGMbtyUZ9cQYZhuKtbWrcvMH1qbxG2GW9jaLVcCVcPZl9s59E3esUrN-Ne_uiHHBvbtSjsCxoAPjeGZxoZMUbw5LfQDbJVFR5iFlwzwFqW7kJhrhq3atuq-MfuGEhsiIsbzrEJfoI_rvn26I7ZAgSQBxxOLqTKzN1v2vgSby3F5XVR1HtbigViBLNoSv78BdW_Jn71Oi29mo2SxT-0hHtFxb_NB7-vEtMYtCQuC7nc9ZvTc8ztcjzPDryvYvWzxrjRwYT2uYLksUnYVpM9_q9WLHiCDOPPhmWKYjvv0mCdkWgftdw7nPMrkL4PWN0BI734V3F157hDi2jipnXVkinfOENZ16CqrKXkbF7fT0H119I8_5_mj_Px-Y_wgYQFWHSqiE80ybLI6QjXMWzwVZ9tdHEUIsmxZHJd2E1Sl9Ml-TTKy4wI7PKsZm4kkJspHwfw7-J9z3YwFLFFelU2rlA32gMzKffPHhuMqvsqywVTYVzTR7MGsKLq3byiXjFIwhI2IcYHXiX7glau7rWjkdnAGeGOls8BH4O54x7_Ujm7ItBe4QW43RouiKbf1hFcN4Nq8KziAOFiekyUmNSm-20fcLVg5HoR81pYO8Cw66MpAOPohXZQR75pohEqjtVXjEzwqTpBWzRl35pZpE0ivAHsQzuzo0330YHUEB1WVgPtxZYp-AbJRpTmiTUPSknWVSlYIoCUTsh5xrBLMn7N-nWybUp-y5pJ8dxcOv6ZkzjBBBAunmc5jz32qi1VZqxy0NRzRN5Pvz4JS-FxwJXkTmYQNP3dRqIJUnXp4lp2QCOf5JwYiFEEkGmkIKF4pXrmWjhXTIu7X_tB7YhWlBYIF6VxDmYu__-pBERMJW3FU8YERG02pkY9CzD_YEOqurp65VB4pT8MNSXnUxCyNEx3xqTyTWn3hIHDCj3DQKfJ-13iZHwilyCopFr9xvxg8D-hn5V9pJqdtXPm2jTWvuXSHSAg5ihY8HvAK4jJtIEQh0xOGLV0436thTg4o87fIQJYDriWV-mp_p2rOAS9llwgLs9mUVtZ5Lk5qrkQrZatyvAyaPpD6klKSkBzKVFmrFoCEQ0HSKfwXcZhPewkh8lCVw-DVZSQFg';
