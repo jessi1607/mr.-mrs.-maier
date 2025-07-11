@@ -1,170 +1,155 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Jessica & Christoph – 20.06.2026</title>
   <style>
     body {
-      font-family: 'Helvetica Neue', sans-serif;
-      background-color: #ffffff;
-      color: #1a1a1a;
-      margin: 0;
-      padding: 0;
+      background: #ffffff;
+      color: #1e1e1e;
+      font-family: 'Georgia', serif;
       text-align: center;
+      padding: 2rem;
     }
-
-    header {
-      background-color: #1a1a1a;
-      color: white;
-      padding: 40px 20px 20px;
-    }
-
     h1 {
-      font-size: 2.5em;
-      margin-bottom: 5px;
+      font-size: 2.8rem;
+      color: #2a4d2a;
+      margin-bottom: 0.2rem;
     }
-
     h2 {
-      font-weight: normal;
-      font-size: 1.2em;
-      color: #d4d4d4;
+      font-style: italic;
+      color: #000;
+      margin-bottom: 2rem;
     }
-
-    main {
-      padding: 30px 20px;
+    select, button {
+      font-size: 1rem;
+      padding: 0.5rem 1rem;
+      margin: 0.5rem;
+      border-radius: 6px;
+      border: 2px solid #2a4d2a;
+      background: white;
+      color: #2a4d2a;
+      cursor: pointer;
     }
-
-    video, canvas {
-      width: 100%;
-      max-width: 400px;
-      border-radius: 10px;
-      margin-top: 20px;
-    }
-
     button {
-      background-color: #2e7d32;
+      background: #2a4d2a;
       color: white;
       border: none;
-      padding: 12px 24px;
-      margin: 12px 8px;
-      font-size: 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s ease;
     }
-
     button:hover {
-      background-color: #1b5e20;
+      background: #1e3d1e;
     }
-
+    video, img {
+      display: block;
+      margin: 1rem auto;
+      max-width: 90vw;
+      border: 3px solid #2a4d2a;
+      border-radius: 10px;
+    }
     #message {
-      margin-top: 20px;
-      font-size: 1em;
-      color: #2e7d32;
-    }
-
-    footer {
-      margin-top: 40px;
-      font-size: 0.9em;
-      color: #777;
+      margin-top: 1rem;
+      font-weight: bold;
+      color: #2a4d2a;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Jessica & Christoph</h1>
-    <h2>20.06.2026 · Gemeinsam Hand in Hand ein Leben lang</h2>
-  </header>
+  <h1>Jessica & Christoph</h1>
+  <h2>20.06.2026</h2>
+  
+  <label for="cameraSelect">Kamera wählen:</label>
+  <select id="cameraSelect"></select><br/>
 
-  <main>
-    <p>Mach ein Foto und teile deinen Moment mit uns!</p>
+  <button id="startBtn">Kamera starten</button>
+  <button id="snapBtn" disabled>Foto machen</button>
+  <button id="uploadBtn" disabled>Hochladen</button>
 
-    <video id="video" autoplay playsinline></video>
-    <canvas id="canvas" style="display:none;"></canvas><br>
-
-    <button onclick="switchCamera()">Kamera wechseln</button>
-    <button onclick="takePhoto()">Foto machen</button>
-    <button onclick="uploadPhoto()">Hochladen</button>
-
-    <div id="message"></div>
-  </main>
-
-  <footer>
-    &copy; 2026 Jessica & Christoph
-  </footer>
+  <video id="video" autoplay playsinline style="display:none;"></video>
+  <img id="photo" style="display:none;" alt="Vorschau"/>
+  <div id="message"></div>
 
   <script>
-    let video = document.getElementById('video');
-    let canvas = document.getElementById('canvas');
-    let context = canvas.getContext('2d');
-    let currentStream;
-    let useFrontCamera = false;
+    const cameraSelect = document.getElementById('cameraSelect'),
+          startBtn = document.getElementById('startBtn'),
+          snapBtn  = document.getElementById('snapBtn'),
+          uploadBtn= document.getElementById('uploadBtn'),
+          video    = document.getElementById('video'),
+          photo    = document.getElementById('photo'),
+          message  = document.getElementById('message');
+    let stream, blob;
 
-    async function startCamera() {
-      if (currentStream) {
-        currentStream.getTracks().forEach(track => track.stop());
-      }
+    const DROPBOX_ACCESS_TOKEN = 'HIER_DEIN_DROPBOX_ACCESS_TOKEN';
 
-      const constraints = {
-        video: {
-          facingMode: useFrontCamera ? 'user' : 'environment'
-        }
-      };
-
-      try {
-        currentStream = await navigator.mediaDevices.getUserMedia(constraints);
-        video.srcObject = currentStream;
-      } catch (err) {
-        document.getElementById('message').innerText = 'Kamera konnte nicht gestartet werden.';
-      }
-    }
-
-    function switchCamera() {
-      useFrontCamera = !useFrontCamera;
-      startCamera();
-    }
-
-    function takePhoto() {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    }
-
-    function uploadPhoto() {
-      let dataURL = canvas.toDataURL('image/jpeg');
-      let blob = dataURItoBlob(dataURL);
-      let formData = new FormData();
-      formData.append('file', blob, 'hochzeitsfoto.jpg');
-
-      fetch('https://www.dropbox.com/request/a6mEroZUdS7bUMPYiGV0', {
-        method: 'POST',
-        mode: 'no-cors',
-        body: formData
-      })
-      .then(() => {
-        document.getElementById('message').innerText = 'Bild wurde hochgeladen.';
-      })
-      .catch(() => {
-        document.getElementById('message').innerText = 'Upload fehlgeschlagen.';
+    async function listCameras() {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      devices.filter(d => d.kind === 'videoinput').forEach((d, i) => {
+        const o = document.createElement('option');
+        o.value = d.deviceId;
+        o.text = d.label || `Kamera ${i + 1}`;
+        cameraSelect.append(o);
       });
     }
 
-    function dataURItoBlob(dataURI) {
-      let byteString = atob(dataURI.split(',')[1]);
-      let mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-      let ab = new ArrayBuffer(byteString.length);
-      let ia = new Uint8Array(ab);
-      for (let i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i);
+    async function startCamera() {
+      if (stream) stream.getTracks().forEach(t => t.stop());
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { deviceId: cameraSelect.value }
+        });
+        video.srcObject = stream;
+        video.style.display = 'block';
+        snapBtn.disabled = false;
+        message.textContent = '';
+      } catch {
+        message.textContent = 'Kamera-Zugriff fehlgeschlagen';
       }
-      return new Blob([ab], { type: mimeString });
     }
 
-    window.onload = () => {
-      startCamera();
+    snapBtn.onclick = () => {
+      const c = document.createElement('canvas');
+      c.width = video.videoWidth;
+      c.height = video.videoHeight;
+      c.getContext('2d').drawImage(video, 0, 0);
+      c.toBlob(b => {
+        blob = b;
+        photo.src = URL.createObjectURL(b);
+        photo.style.display = 'block';
+        uploadBtn.disabled = false;
+      }, 'image/jpeg', 0.9);
+      video.style.display = 'none';
     };
+
+    uploadBtn.onclick = async () => {
+      if (!blob) return;
+      message.textContent = 'Lade hoch…';
+      const name = `JessicaChristoph_${Date.now()}.jpg`;
+      try {
+        const res = await fetch('https://content.dropboxapi.com/2/files/upload', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${DROPBOX_ACCESS_TOKEN}`,
+            'Dropbox-API-Arg': JSON.stringify({
+              path: '/' + name,
+              mode: 'add',
+              autorename: true,
+              mute: false
+            }),
+            'Content-Type': 'application/octet-stream'
+          },
+          body: blob
+        });
+        if (!res.ok) throw '';
+        message.textContent = 'Upload erfolgreich 🎉';
+        uploadBtn.disabled = true;
+      } catch {
+        message.textContent = 'Upload fehlgeschlagen';
+      }
+    };
+
+    cameraSelect.onchange = startCamera;
+    startBtn.onclick = startCamera;
+    listCameras();
   </script>
 </body>
 </html>
-
