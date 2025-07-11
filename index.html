@@ -14,13 +14,19 @@
     }
     h1 {
       font-size: 2.8rem;
-      color: #2a4d2a;
+      color: ##bfa34a;
       margin-bottom: 0.2rem;
     }
     h2 {
       font-style: italic;
-      color: #000;
+      color: ##bfa34a;
       margin-bottom: 2rem;
+    } 
+    h3 {
+      font-family: 'Georgia', serif;
+      font-size: 1.2rem;
+      color: #000;
+    }
     }
     select, button {
       font-size: 1rem;
@@ -57,6 +63,8 @@
 <body>
   <h1>Jessica & Christoph</h1>
   <h2>20.06.2026</h2>
+  <h3>Teilt eure besonderen Momente mit uns!</h3>
+
 
 <video id="video" autoplay playsinline></video>
   <canvas id="canvas"></canvas>
@@ -66,8 +74,8 @@
     <button id="backBtn">Rückkamera</button>
   </div>
 
-  <button id="takePhotoBtn">Foto machen</button>
-  <button id="uploadBtn" disabled>Hochladen</button>
+  <button id="takePhotoBtn">📸 Foto machen</button>
+  <button id="uploadBtn" disabled>⬆️ Hochladen</button>
 
   <img id="photo" alt="Aufgenommenes Foto" />
 
@@ -149,8 +157,7 @@
     message.textContent = 'Lade Bild hoch...';
 
     // Dropbox Access Token (bitte mit deinem eigenen Token ersetzen)
-    const DROPBOX_ACCESS_TOKEN = 'sl.u.AF09KUWmSCXi7yIlar4UloHwPPVY0PijSB4f49OQzr6tOSIrIY5yL0-mrZtsmDdw8IJhE-AdP05fu_KF74kcr0oy5gYftA93PbIZDr9edKHl1RmhJHAtuL4wrMIH0vmEdWFVe_MFjLAo5hs2tJlyOGBtbqXdSdF5dGA0EESL8f6DU6NSXmFpUqsGoUxhL9Cpfizr-qiKAvo6mPe2mi3h54R4Mp_hreaw_pV1jw8f6tFIZffZeubPr0eKwP_NTEyEX-iXMcMtq4Br4o3Iddv-YA6yLm-n_cWF9s6Jyz0TRuHSffiT6ynPIAe3IK4So464yKAgJz8D1fn3nh96t5x5V9TkD2hvjECiW3D7P8WQqrNBOAQi06OywG0ffn0128vSHzHrEgUyywXt7gZ_J29TAFK5s95JPSdDh75yGDIHm8ncqQ1DoJ27EunY-jQZGHdjjIhErSN8aH-ED6vlSfKxeu72uvAZ2ZaXf3uKMMYdKDBAvrRPCYRzjLNMyVz9WKeOszlpJz-tI-CqAkcnAMmHtwZog52L2Qd3SPeNnoboYyX530_c38bwxRhpJbNZYZP8uNgOUQfqo3nKlai3k5O6Hg3DXI7OVtAeGpBmJGf-ohxtN-ozK6uyc_HNZm9c82e-llDOEBfXHQZhSYgjDcyqH0Mq5YiMXvPMPhiLK5cycYw175SZuvMj5acjPDHIebQTgfmJu0M4n45LKYfOFfe_pCfF7u8NtscIX-J5w3NkPlMuXs35coGjy-Yr3L6b5TdDTUFb0vIDRxt_SML-svPrD3Ln0JdeASSoD3cIHh_PYxFIazy6G_9_uCzkoIIkVN4837WcNVtf7MIMr0itTH31KKCuI6wYYYfO3oGI8gq2lkgonhoC3bVeRAr-RDDn5fic4r5M5Ytto6VRcWYILmallfdUSFZzbEbSWihxBI61V3jciiTyoiuKRUE4wELJsseQ3BOWiKM_6tQkt4s_STWQW8sTquDPE7LJsYGV9dgxqvf-SWG8sadrrFZQ4XIyhlMz0GtxF6m6qy08Sth3jNGHcOQfPpoB2YGfCAb7dhkz6An4ecq8hBgFWjMB2gT0vU1hNz_pz4_S09IXc59UhaBytB1EmGnOTZSoXeq3a69Ni_jO8aECZXPG0Ng5KkwRfI1F1uXUpCQl5Bdy6w6fteBq4I7H1G5O1XiGub0jG3U8tBgfbvFspteWjP7CVgInaYc9Hb_GnladtB31T9TIuzXiczb3UEnZ8jgECbw2OBOb1jTHDtl34p9G5LFTs1b1aI0tBeTwjo2QQgJPHkybyMicb541sECi0szfLzRNGiNwkIZnCQ';
-
+    const DROPBOX_ACCESS_TOKEN = 'sl.u.AF2bQ_PFuopa1bJhEKpl4D98_IwNflkbsEHanHBl95Z8gFLXsyRr1Q95c4NaOYziu45tkte98L-mBXs8KTGj1P0EhNqW9AFo8w_3N2_jlPw53opeJEDLzKh5qgbVAvTEyZXRd9DZFzO0w0aSLQVyLMec2jZGwMAoHZ-ziQyMjHcPVcEzkcpWHL8UMuH-1GrmeOivI1gKrYkG2w_Q4fRjT70lBNqUJLpZMqP5fZbll08TR_5wQ4yMFF0Zc92nqVqCq8zZObUHI5PHeCxOkrVdK4l3seI-u52GyM6mk7Sb022fxtCieokGR4auYrEWP5YI7b9XeTAXLlxM8dl0gFbzj03yCZO9Dja41L55Rbj9s9NIxlVAmZcAGrj5ao_g_k76lfLh4N2VJ9Z7ihQJg2zB8CvgI55rGof4cFrmGQPUKgL21dMyJ2jxkghVkEWnl22PUVg-VunGnRb1uP1d06HOgJgAeUlGqBmS3yBXw6xGEoG-S3I-rikBZSNmWtRiLaahRIoJt8Et1WcPm-sCWJ3xYZinfBdMoz4xJkouDkiWXy232UljiO__ctyhAjVDx0jQgi1KXWk_EUbJtkfll8UDgmh7gn-EsY_bmwS4X1DZveKG5waAvL13X1B7F4Lm7o4V3ZzM55L2keHWsU-yn_X8Fso0P9hP_zQGVw7q15q1hvUC_SmskmVwZloo6mtQBLbfUIWChnz2clNNX-k0Ut0Q4bIYJCG34FFLR-gLWW-eKWUHhYoCTG1QncfFjDidh3mVEBVTwR3h3DbMVRgiydKToG2LG5I35fnpglWGfCa4qXs81jtjtv1JOFiYJ5mZ_nd4SUAOU_3JnnpA05Q-p7QYXKjRmfqj36ONsRap_0iFnY_1XAqEq2N4ohHzl32twJ3CiBX0KrlRRodgHNZtX8LMulSRmIW_Eq9sa9QXmBnOe92nuAr-VZQx84N1UO1wHN1n-JGMToVQ8TjAw2Ef-6dZt93VVOAB3Ric4f_PbiThG0iK8F2iY77a_tZHO3u1y0km8hQH4daDIF38Od1cH-FkVXeL8hz6kuSAsoo7n9LljOrIztytYQxHI0yiyTJkbsOomVFS_RMC5BBH7kk3ulsabFkvl_HS6bmNxw8R02V9Jrhlrrnnz3JJCchBVnSThKx7H3HL3UxyO2WD56C8caN5Ae4KuwuJotpC_t_qGn1-fCkpGsRbV93z3OVy-gbEQUHXiZ13ws0HE-mTG_FKjWcJgjtGsmAZn9RJH17d1t9Ai4QbpJd1jKy9lxThPdNi4fwX9eyeOPWYDAoC9CaMXH4hh4FI'
     // Erstelle FormData für Upload
     const filename = `LenaFranz_${Date.now()}.jpg`;
 
@@ -175,7 +182,7 @@
         throw new Error(error.error_summary || 'Unbekannter Fehler');
       }
 
-      message.textContent = 'Bild erfolgreich hochgeladen. Danke!';
+      message.textContent = 'Bild hochgeladen. Vielen Dank!';
 
       // Bild nach Upload zurücksetzen
       photo.src = '';
