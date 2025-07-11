@@ -7,67 +7,77 @@
   <style>
     body {
       background: #ffffff;
-      color: #1e1e1e;
+      color: #000;
       font-family: 'Georgia', serif;
       text-align: center;
       padding: 2rem;
+      background-position: top center;
     }
     h1 {
-      font-size: 2.8rem;
-      color: #2a4d2a;
-      margin-bottom: 0.2rem;
+      font-size: 2.5rem;
+      color: #bfa34a;
+      margin-bottom: 0.3rem;
+      font-family: 'Georgia', serif;
     }
     h2 {
-      font-style: italic;
+      font-size: 1.3rem;
+      font-weight: normal;
+      color: #bfa34a;
+      margin-bottom: 1rem;
+    }
+    h3 {
+      font-family: 'Georgia', serif;
+      font-size: 1.2rem;
       color: #000;
-      margin-bottom: 2rem;
     }
     select, button {
       font-size: 1rem;
-      padding: 0.5rem 1rem;
+      padding: 0.6rem 1.2rem;
       margin: 0.5rem;
-      border-radius: 6px;
-      border: 2px solid #2a4d2a;
-      background: white;
-      color: #2a4d2a;
+      border-radius: 8px;
+      border: none;
+      background: #2a4d2a;
+      color: #fff;
       cursor: pointer;
     }
-    button {
-      background: #2a4d2a;
-      color: white;
-      border: none;
-    }
     button:hover {
-      background: #1e3d1e;
+      background: #1f3c1f;
     }
     video, img {
       display: block;
       margin: 1rem auto;
       max-width: 90vw;
-      border: 3px solid #2a4d2a;
+      border: 2px solid #bfa34a;
       border-radius: 10px;
     }
     #message {
       margin-top: 1rem;
       font-weight: bold;
-      color: #2a4d2a;
+      color: #bfa34a;
+    }
+    footer {
+      margin-top: 2rem;
+      font-style: italic;
+      color: #666;
     }
   </style>
 </head>
 <body>
-  <h1>Jessica & Christoph</h1>
+  <h1>Jessica <span style="color: #000;">&</span> Christoph</h1>
   <h2>20.06.2026</h2>
-  
-  <label for="cameraSelect">Kamera wählen:</label>
-  <select id="cameraSelect"></select><br/>
+  <h3>Teilt eure besonderen Momente mit uns!</h3>
 
+  <label for="cameraSelect">Kamera wählen:</label><br/>
+  <select id="cameraSelect"></select><br/>
   <button id="startBtn">Kamera starten</button>
-  <button id="snapBtn" disabled>Foto machen</button>
-  <button id="uploadBtn" disabled>Hochladen</button>
+  <button id="snapBtn" disabled>📸 Foto machen</button>
+  <button id="uploadBtn" disabled>⬆️ Hochladen</button>
 
   <video id="video" autoplay playsinline style="display:none;"></video>
   <img id="photo" style="display:none;" alt="Vorschau"/>
   <div id="message"></div>
+
+  <footer>Danke fürs Mitmachen!</footer>
 
   <script>
     const cameraSelect = document.getElementById('cameraSelect'),
@@ -77,26 +87,24 @@
           video    = document.getElementById('video'),
           photo    = document.getElementById('photo'),
           message  = document.getElementById('message');
-    let stream, blob;
 
-    const DROPBOX_ACCESS_TOKEN = 'HIER_DEIN_DROPBOX_ACCESS_TOKEN';
+    let stream, blob;
+    const DROPBOX_ACCESS_TOKEN = 'sl.u.AF1AVvWSZesjV8N-pZTAvwUM-puo2R8g9B9RC9ItUPLcsZIt3VvpbWwFJ-q8z53OllgXTvNjMMGrvMokyoVnUbO27GWZRK6TGinWTiuxk595QK0uThDG3i5EFN9-6hluDvjCw1l3iCc9ZFIM5yTQA8dU_tgRilKGydd1Y_MTu49xQ8JXlKmtM0nsYdPh1NiOFzk279ytGFFT9gxjk7NGMbtyUZ9cQYZhuKtbWrcvMH1qbxG2GW9jaLVcCVcPZl9s59E3esUrN-Ne_uiHHBvbtSjsCxoAPjeGZxoZMUbw5LfQDbJVFR5iFlwzwFqW7kJhrhq3atuq-MfuGEhsiIsbzrEJfoI_rvn26I7ZAgSQBxxOLqTKzN1v2vgSby3F5XVR1HtbigViBLNoSv78BdW_Jn71Oi29mo2SxT-0hHtFxb_NB7-vEtMYtCQuC7nc9ZvTc8ztcjzPDryvYvWzxrjRwYT2uYLksUnYVpM9_q9WLHiCDOPPhmWKYjvv0mCdkWgftdw7nPMrkL4PWN0BI734V3F157hDi2jipnXVkinfOENZ16CqrKXkbF7fT0H119I8_5_mj_Px-Y_wgYQFWHSqiE80ybLI6QjXMWzwVZ9tdHEUIsmxZHJd2E1Sl9Ml-TTKy4wI7PKsZm4kkJspHwfw7-J9z3YwFLFFelU2rlA32gMzKffPHhuMqvsqywVTYVzTR7MGsKLq3byiXjFIwhI2IcYHXiX7glau7rWjkdnAGeGOls8BH4O54x7_Ujm7ItBe4QW43RouiKbf1hFcN4Nq8KziAOFiekyUmNSm-20fcLVg5HoR81pYO8Cw66MpAOPohXZQR75pohEqjtVXjEzwqTpBWzRl35pZpE0ivAHsQzuzo0330YHUEB1WVgPtxZYp-AbJRpTmiTUPSknWVSlYIoCUTsh5xrBLMn7N-nWybUp-y5pJ8dxcOv6ZkzjBBBAunmc5jz32qi1VZqxy0NRzRN5Pvz4JS-FxwJXkTmYQNP3dRqIJUnXp4lp2QCOf5JwYiFEEkGmkIKF4pXrmWjhXTIu7X_tB7YhWlBYIF6VxDmYu__-pBERMJW3FU8YERG02pkY9CzD_YEOqurp65VB4pT8MNSXnUxCyNEx3xqTyTWn3hIHDCj3DQKfJ-13iZHwilyCopFr9xvxg8D-hn5V9pJqdtXPm2jTWvuXSHSAg5ihY8HvAK4jJtIEQh0xOGLV0436thTg4o87fIQJYDriWV-mp_p2rOAS9llwgLs9mUVtZ5Lk5qrkQrZatyvAyaPpD6klKSkBzKVFmrFoCEQ0HSKfwXcZhPewkh8lCVw-DVZSQFg';
 
     async function listCameras() {
       const devices = await navigator.mediaDevices.enumerateDevices();
       devices.filter(d => d.kind === 'videoinput').forEach((d, i) => {
-        const o = document.createElement('option');
-        o.value = d.deviceId;
-        o.text = d.label || `Kamera ${i + 1}`;
-        cameraSelect.append(o);
+        const option = document.createElement('option');
+        option.value = d.deviceId;
+        option.text = d.label || `Kamera ${i+1}`;
+        cameraSelect.appendChild(option);
       });
     }
 
     async function startCamera() {
       if (stream) stream.getTracks().forEach(t => t.stop());
       try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { deviceId: cameraSelect.value }
-        });
+        stream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: cameraSelect.value } });
         video.srcObject = stream;
         video.style.display = 'block';
         snapBtn.disabled = false;
@@ -107,11 +115,11 @@
     }
 
     snapBtn.onclick = () => {
-      const c = document.createElement('canvas');
-      c.width = video.videoWidth;
-      c.height = video.videoHeight;
-      c.getContext('2d').drawImage(video, 0, 0);
-      c.toBlob(b => {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      canvas.toBlob(b => {
         blob = b;
         photo.src = URL.createObjectURL(b);
         photo.style.display = 'block';
@@ -122,24 +130,19 @@
 
     uploadBtn.onclick = async () => {
       if (!blob) return;
-      message.textContent = 'Lade hoch…';
-      const name = `JessicaChristoph_${Date.now()}.jpg`;
+      message.textContent = 'Lade hoch...';
+      const filename = `JessicaChristoph_${Date.now()}.jpg`;
       try {
         const res = await fetch('https://content.dropboxapi.com/2/files/upload', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${DROPBOX_ACCESS_TOKEN}`,
-            'Dropbox-API-Arg': JSON.stringify({
-              path: '/' + name,
-              mode: 'add',
-              autorename: true,
-              mute: false
-            }),
+            'Dropbox-API-Arg': JSON.stringify({ path: '/' + filename, mode: 'add', autorename: true, mute: false }),
             'Content-Type': 'application/octet-stream'
           },
           body: blob
         });
-        if (!res.ok) throw '';
+        if (!res.ok) throw new Error();
         message.textContent = 'Upload erfolgreich 🎉';
         uploadBtn.disabled = true;
       } catch {
@@ -147,8 +150,8 @@
       }
     };
 
-    cameraSelect.onchange = startCamera;
     startBtn.onclick = startCamera;
+    cameraSelect.onchange = startCamera;
     listCameras();
   </script>
 </body>
