@@ -58,15 +58,19 @@
   <h1>Jessica & Christoph</h1>
   <h2>20.06.2026</h2>
   
-  <label for="cameraSelect">Kamera wählen:</label>
-  <select id="cameraSelect"></select><br/>
+  <video id="video" autoplay playsinline></video>
+  <canvas id="canvas"></canvas>
 
-  <button id="startBtn">Kamera starten</button>
-  <button id="snapBtn" disabled>Foto machen</button>
+  <div>
+    <button id="frontBtn">Frontkamera</button>
+    <button id="backBtn">Rückkamera</button>
+  </div>
+
+  <button id="takePhotoBtn">Foto machen</button>
   <button id="uploadBtn" disabled>Hochladen</button>
 
-  <video id="video" autoplay playsinline style="display:none;"></video>
-  <img id="photo" style="display:none;" alt="Vorschau"/>
+  <img id="photo" alt="Aufgenommenes Foto" />
+
   <div id="message"></div>
 
   <script>
