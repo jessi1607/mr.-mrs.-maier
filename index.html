@@ -67,8 +67,9 @@
   <h2>20.06.2026</h2>
   <h3>Teilt eure besonderen Momente mit uns!</h3>
 
- <video id="video" autoplay playsinline></video>
+  <video id="video" autoplay playsinline></video>
   <canvas id="canvas"></canvas>
+  <img id="photo" alt="Aufgenommenes Foto" />
 
   <div>
     <button id="frontBtn">Frontkamera</button>
@@ -78,92 +79,109 @@
   <button id="takePhotoBtn">📸 Foto machen</button>
   <button id="uploadBtn" disabled>⬆️ Hochladen</button>
 
-  <img id="photo" alt="Aufgenommenes Foto" />
-
   <div id="message"></div>
-  
   <footer>Danke fürs Mitmachen!</footer>
 
   <script>
-  const video = document.getElementById('video');
-  const canvas = document.getElementById('canvas');
-  const photo = document.getElementById('photo');
-  const message = document.getElementById('message');
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const photo = document.getElementById('photo');
+    const message = document.getElementById('message');
 
     let currentStream = null;
-  let currentFacingMode = 'user'; // 'user' = front, 'environment' = back
-  let capturedImageBlob = null;
+    let currentFacingMode = 'user';
+    let capturedImageBlob = null;
 
-  async function startCamera(facingMode) {
-    if (currentStream) {
-      currentStream.getTracks().forEach(track => track.stop());
-    }
-    try {
-      currentStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { exact: facingMode } },
-        audio: false
-      });
-      video.srcObject = currentStream;
-      currentFacingMode = facingMode;
-      message.textContent = '';
-      document.getElementById('uploadBtn').disabled = true;
-      photo.src = '';
-      capturedImageBlob = null;
-    } catch (err) {
-      // Fallback: ohne exact (bei manchen Browsern besser)
+    // --- Dropbox Credentials ---
+    const DROPBOX_REFRESH_TOKEN = "hPbaMzF_PPwAAAAAAAAAAVLY0yJnsYxOoWH0RIuixW-19iztORTYQTyBbNSYZuj1";
+    const DROPBOX_APP_KEY = "bqtnuo0pptbtwh2";
+    const DROPBOX_APP_SECRET = "n5ftqwpsa0nz4mb";
+
+    // --- Kamera starten ---
+    async function startCamera(facingMode) {
+      if (currentStream) currentStream.getTracks().forEach(track => track.stop());
       try {
         currentStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: facingMode },
+          video: { facingMode: { exact: facingMode } },
           audio: false
         });
-        video.srcObject = currentStream;
-        currentFacingMode = facingMode;
-        message.textContent = '';
-        document.getElementById('uploadBtn').disabled = true;
-        photo.src = '';
-        capturedImageBlob = null;
-      } catch (error) {
-        console.error('Kamera konnte nicht gestartet werden:', error);
-        message.textContent = 'Kamera konnte nicht gestartet werden. Bitte überprüfe die Berechtigungen.';
+      } catch {
+        currentStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode },
+          audio: false
+        });
       }
-    }
-  }
-
-  document.getElementById('frontBtn').addEventListener('click', () => startCamera('user'));
-  document.getElementById('backBtn').addEventListener('click', () => startCamera('environment'));
-
-  document.getElementById('takePhotoBtn').addEventListener('click', () => {
-    if (!currentStream) {
-      message.textContent = 'Bitte erst Kamera auswählen.';
-      return;
-    }
-    const width = video.videoWidth;
-    const height = video.videoHeight;
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0, width, height);
-    canvas.toBlob(blob => {
-      capturedImageBlob = blob;
-      photo.src = URL.createObjectURL(blob);
-      document.getElementById('uploadBtn').disabled = false;
-      message.textContent = 'Foto aufgenommen. Jetzt Hochladen klicken.';
-    }, 'image/jpeg', 0.95);
-  });
-
-  document.getElementById('uploadBtn').addEventListener('click', async () => {
-    if (!capturedImageBlob) {
-      message.textContent = 'Bitte erst ein Foto machen.';
-      return;
+      video.srcObject = currentStream;
+      currentFacingMode = facingMode;
+      message.textContent='';
+      document.getElementById('uploadBtn').disabled=true;
+      photo.src=''; capturedImageBlob=null;
     }
 
-    message.textContent = 'Lade Bild hoch...';
+    document.getElementById('frontBtn').addEventListener('click', () => startCamera('user'));
+    document.getElementById('backBtn').addEventListener('click', () => startCamera('environment'));
 
-    const DROPBOX_ACCESS_TOKEN = 'sl.u.AF1AVvWSZesjV8N-pZTAvwUM-puo2R8g9B9RC9ItUPLcsZIt3VvpbWwFJ-q8z53OllgXTvNjMMGrvMokyoVnUbO27GWZRK6TGinWTiuxk595QK0uThDG3i5EFN9-6hluDvjCw1l3iCc9ZFIM5yTQA8dU_tgRilKGydd1Y_MTu49xQ8JXlKmtM0nsYdPh1NiOFzk279ytGFFT9gxjk7NGMbtyUZ9cQYZhuKtbWrcvMH1qbxG2GW9jaLVcCVcPZl9s59E3esUrN-Ne_uiHHBvbtSjsCxoAPjeGZxoZMUbw5LfQDbJVFR5iFlwzwFqW7kJhrhq3atuq-MfuGEhsiIsbzrEJfoI_rvn26I7ZAgSQBxxOLqTKzN1v2vgSby3F5XVR1HtbigViBLNoSv78BdW_Jn71Oi29mo2SxT-0hHtFxb_NB7-vEtMYtCQuC7nc9ZvTc8ztcjzPDryvYvWzxrjRwYT2uYLksUnYVpM9_q9WLHiCDOPPhmWKYjvv0mCdkWgftdw7nPMrkL4PWN0BI734V3F157hDi2jipnXVkinfOENZ16CqrKXkbF7fT0H119I8_5_mj_Px-Y_wgYQFWHSqiE80ybLI6QjXMWzwVZ9tdHEUIsmxZHJd2E1Sl9Ml-TTKy4wI7PKsZm4kkJspHwfw7-J9z3YwFLFFelU2rlA32gMzKffPHhuMqvsqywVTYVzTR7MGsKLq3byiXjFIwhI2IcYHXiX7glau7rWjkdnAGeGOls8BH4O54x7_Ujm7ItBe4QW43RouiKbf1hFcN4Nq8KziAOFiekyUmNSm-20fcLVg5HoR81pYO8Cw66MpAOPohXZQR75pohEqjtVXjEzwqTpBWzRl35pZpE0ivAHsQzuzo0330YHUEB1WVgPtxZYp-AbJRpTmiTUPSknWVSlYIoCUTsh5xrBLMn7N-nWybUp-y5pJ8dxcOv6ZkzjBBBAunmc5jz32qi1VZqxy0NRzRN5Pvz4JS-FxwJXkTmYQNP3dRqIJUnXp4lp2QCOf5JwYiFEEkGmkIKF4pXrmWjhXTIu7X_tB7YhWlBYIF6VxDmYu__-pBERMJW3FU8YERG02pkY9CzD_YEOqurp65VB4pT8MNSXnUxCyNEx3xqTyTWn3hIHDCj3DQKfJ-13iZHwilyCopFr9xvxg8D-hn5V9pJqdtXPm2jTWvuXSHSAg5ihY8HvAK4jJtIEQh0xOGLV0436thTg4o87fIQJYDriWV-mp_p2rOAS9llwgLs9mUVtZ5Lk5qrkQrZatyvAyaPpD6klKSkBzKVFmrFoCEQ0HSKfwXcZhPewkh8lCVw-DVZSQFg';
-    
-    startBtn.onclick = startCamera;
-    cameraSelect.onchange = startCamera;
-    listCameras();
+    // --- Foto aufnehmen ---
+    document.getElementById('takePhotoBtn').addEventListener('click', () => {
+      if(!currentStream){ message.textContent='Bitte erst Kamera auswählen.'; return; }
+      const w = video.videoWidth, h = video.videoHeight;
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      if(currentFacingMode==='user'){ ctx.translate(w,0); ctx.scale(-1,1); }
+      ctx.drawImage(video,0,0,w,h); ctx.setTransform(1,0,0,1,0,0);
+      canvas.toBlob(blob => {
+        capturedImageBlob = blob;
+        photo.src = URL.createObjectURL(blob);
+        document.getElementById('uploadBtn').disabled=false;
+        message.textContent='Foto aufgenommen. Jetzt Hochladen klicken.';
+      }, 'image/jpeg', 0.95);
+    });
+
+    // --- Access Token vom Refresh Token ---
+    async function getAccessToken(){
+      const resp = await fetch("https://api.dropbox.com/oauth2/token",{
+        method:"POST",
+        headers:{"Content-Type":"application/x-www-form-urlencoded"},
+        body: new URLSearchParams({
+          grant_type: "refresh_token",
+          refresh_token: DROPBOX_REFRESH_TOKEN,
+          client_id: DROPBOX_APP_KEY,
+          client_secret: DROPBOX_APP_SECRET
+        })
+      });
+      const data = await resp.json();
+      if(!data.access_token) throw new Error("Kein Access Token erhalten");
+      return data.access_token;
+    }
+
+    // --- Upload direkt zu Dropbox ---
+    document.getElementById('uploadBtn').addEventListener('click', async () => {
+      if(!capturedImageBlob){ message.textContent='Bitte erst ein Foto machen.'; return; }
+      message.textContent='Lade Bild hoch...';
+      try{
+        const accessToken = await getAccessToken();
+        const filename = `JessicaChristoph_${Date.now()}.jpg`;
+        const resp = await fetch("https://content.dropboxapi.com/2/files/upload", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${accessToken}`,
+            "Dropbox-API-Arg": JSON.stringify({ path: "/" + filename, mode:"add", autorename:true, mute:false }),
+            "Content-Type": "application/octet-stream"
+          },
+          body: capturedImageBlob
+        });
+        const text = await resp.text();
+        let result = {};
+        try{ result = JSON.parse(text); } catch{}
+        if(result.name){ message.style.color='#2a4d2a'; message.textContent='Bild erfolgreich hochgeladen!'; }
+        else throw new Error(result.error_summary || "Unbekannter Fehler");
+      }catch(err){ message.style.color='red'; message.textContent='Fehler beim Upload: '+err.message; }
+    });
+
+    startCamera('user');
   </script>
+</body>
+</html>
+
 </body>
 </html>
